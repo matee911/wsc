@@ -33,18 +33,30 @@
 					$('join').className='hidden';
 					$('joined').className='';
 					$('phrase').focus();
-					room._send(room._username, 'has joined!'); // skad sie room wzial?
+					room.connect();
+					//room._send(room._username, 'has joined!'); // skad sie room wzial?
+				},
+				
+				connect: function() {
+					room._send(room._username, {"cmd": "connect"});
+				},
+				
+				message: function(message) {
+					room._send(room._username, {"cmd": "message", "body": message});
 				},
 				
 				_send: function(user, message) {
-					user=user.replace(':', '_'); // a skad ":" ?
+					var payload = JSON.stringify([user, message]);
+					//user=user.replace(':', '_'); // a skad ":" ?
 					if (this._ws)
-						this._ws.send(user+':'+message);
+						//this._ws.send(user+':'+message);
+						this._ws.send(payload);
 				},
 				
 				chat: function(text) {
 					if (text != null && text.length > 0) // nie null i dluzszy niz 0 :P
-						room._send(room._username, text);
+						//room._send(room._username, text);
+						room.message(text);
 				},
 				
 				_onmessage: function(m) {
