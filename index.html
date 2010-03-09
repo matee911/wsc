@@ -15,15 +15,13 @@
 					return event.keyCode;
 			}
 				
-			var room = { // co to za syntax?
+			var room = {
 				join: function(name) {
 					var location = document.location.toString().replace('http:', 'ws:');
-					
 					var location = 'ws://0.0.0.0:1234/';
 					
 					this._username = name;
 					this._ws = new WebSocket(location);
-					// Nizej sa delegaty, dla eventowego WebSocketa
 					this._ws.onopen = this._onopen;
 					this._ws.onmessage = this._onmessage;
 					this._ws.onclose = this._onclose;
@@ -34,33 +32,13 @@
 					$('joined').className='';
 					$('phrase').focus();
 					room.connect();
-					//room._send(room._username, 'has joined!'); // skad sie room wzial?
-				},
-				
-				connect: function() {
-					room._send(room._username, {"cmd": "connect"});
-				},
-				
-				message: function(message) {
-					room._send(room._username, {"cmd": "message", "body": message});
-				},
-				
-				_send: function(user, message) {
-					var payload = JSON.stringify([user, message]);
-					//user=user.replace(':', '_'); // a skad ":" ?
-					if (this._ws)
-						//this._ws.send(user+':'+message);
-						this._ws.send(payload);
-				},
-				
-				chat: function(text) {
-					if (text != null && text.length > 0) // nie null i dluzszy niz 0 :P
-						//room._send(room._username, text);
-						room.message(text);
 				},
 				
 				_onmessage: function(m) {
 					if (m.data) {
+						//var json = JSON.parse(m.data);
+						//alert(json[0]);
+						
 						var c=m.data.indexOf(':');
 						var from=m.data.substring(0, c).replace('<', '&lt;').replace('>', '&gt;');
 						var text=m.data.substring(c+1).replace('<', '&lt;').replace('>', '&gt;');
@@ -85,8 +63,27 @@
 					$('joined').className = 'hidden';
 					$('username').focus();
 					$('chat').innerHTML = '';
-				}
+				},
 				
+				_send: function(user, message) {
+					var payload = JSON.stringify([user, message]);
+					if (this._ws)
+						this._ws.send(payload);
+				},
+				
+				/* *** */
+				connect: function() {
+					room._send(room._username, {"cmd": "connect"});
+				},
+				
+				message: function(message) {
+					room._send(room._username, {"cmd": "message", "body": message});
+				},
+				
+				chat: function(text) {
+					if (text != null && text.length > 0)
+						room.message(text);
+				}
 			};
 		</script>
 		<style type="text/css">
